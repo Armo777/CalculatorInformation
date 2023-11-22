@@ -1,9 +1,7 @@
 package com.example.calculatorinformation.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class ConverterController {
@@ -18,14 +16,22 @@ public class ConverterController {
         return ResponseEntity.ok("Сервер доступен и работает");
     }
 
-    @GetMapping("/convert")
-    public String convertUnits(
-            @RequestParam("value") double value,
-            @RequestParam("from") String fromUnit,
-            @RequestParam("to") String toUnit
-    ) {
-        double result;
+    @PostMapping("/solve")
+    public ResponseEntity<String> solveProblem(@RequestBody ProblemRequest request) {
+        double value = request.getValue();
+        String fromUnit = request.getFromUnit();
+        String toUnit = request.getToUnit();
 
+        // Логика конвертации единиц информации
+        String result = convertUnits(value, fromUnit, toUnit);
+
+        // Формирование ответа в формате JSON
+        return ResponseEntity.ok("{\"result\": " + result + "}");
+    }
+
+    private String convertUnits(double value, String fromUnit, String toUnit) {
+
+        double res;
         // Логика конвертации между различными единицами информации
         if (fromUnit.equalsIgnoreCase("bit")) {
             value /= 8; // Переводим биты в байты
@@ -39,17 +45,17 @@ public class ConverterController {
 
         // Конвертация из байтов в нужную целевую единицу
         if (toUnit.equalsIgnoreCase("bit")) {
-            result = value * 8; // Переводим байты в биты
-            return value + " " + fromUnit + " = " + result + " " + toUnit;
+            res = value * 8; // Переводим байты в биты
+            return value + " " + fromUnit + " = " + res + " " + toUnit;
         } else if (toUnit.equalsIgnoreCase("kb")) {
-            result = value / 1024; // Переводим байты в килобайты
-            return value + " " + fromUnit + " = " + result + " " + toUnit;
+            res = value / 1024; // Переводим байты в килобайты
+            return value + " " + fromUnit + " = " + res + " " + toUnit;
         } else if (toUnit.equalsIgnoreCase("mb")) {
-            result = value / (1024 * 1024); // Переводим байты в мегабайты
-            return value + " " + fromUnit + " = " + result + " " + toUnit;
+            res = value / (1024 * 1024); // Переводим байты в мегабайты
+            return value + " " + fromUnit + " = " + res + " " + toUnit;
         } else if (toUnit.equalsIgnoreCase("gb")) {
-            result = value / (1024 * 1024 * 1024); // Переводим байты в гигабайты
-            return value + " " + fromUnit + " = " + result + " " + toUnit;
+            res = value / (1024 * 1024 * 1024); // Переводим байты в гигабайты
+            return value + " " + fromUnit + " = " + res + " " + toUnit;
         } else if (toUnit.equalsIgnoreCase("byte")) {
             return value + " " + fromUnit + " = " + value + " " + toUnit;
         } else {
